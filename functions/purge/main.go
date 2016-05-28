@@ -25,7 +25,7 @@ func main() {
 		body := strings.NewReader("{\"files\":[\"" + m.Url + "/\"]}")
 
 		client := &http.Client{}
-		url := "https://api.cloudflare.com/client/v4/" + os.Getenv("CLOUDFLARE_IDENTIFIER") + "/purge_cache"
+		url := "https://api.cloudflare.com/client/v4/zones/" + os.Getenv("CLOUDFLARE_IDENTIFIER") + "/purge_cache"
 		fmt.Fprintf(os.Stderr, url)
 		req, err := http.NewRequest("DELETE", url, body)
 		if err != nil {
