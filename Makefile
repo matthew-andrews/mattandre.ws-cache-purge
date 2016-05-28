@@ -1,1 +1,2 @@
-include n.Makefile
+deploy:
+	apex deploy

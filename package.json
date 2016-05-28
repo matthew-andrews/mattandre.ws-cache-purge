@@ -1,6 +1,0 @@
-{
-  "devDependencies": {
-    "eslint": "^2.11.0",
-    "lintspaces-cli": "^0.1.1"
-  }
-}
