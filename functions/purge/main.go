@@ -19,7 +19,7 @@ type S3Update struct {
 			} `json:"object"`
 			Bucket struct {
 				Name string `json:"name"`
-			} `json:"object"`
+			} `json:"bucket"`
 		} `json:"s3"`
 	} `json:"Records"`
 }
