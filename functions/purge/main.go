@@ -1,17 +1,21 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/apex/go-apex"
 	"net/http"
 	"os"
-	"strings"
 )
 
 type message struct {
 	Url string `json:"url"`
+}
+
+type PurgeCacheRequest struct {
+	Files []string `json:"files"`
 }
 
 func main() {
@@ -22,7 +26,14 @@ func main() {
 			return nil, err
 		}
 
-		body := strings.NewReader("{\"files\":[\"" + m.Url + "/\"]}")
+		requestObject, err := json.Marshal(PurgeCacheRequest{
+			Files: []string{m.Url},
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		body := bytes.NewBuffer(requestObject)
 
 		client := &http.Client{}
 		url := "https://api.cloudflare.com/client/v4/zones/" + os.Getenv("CLOUDFLARE_IDENTIFIER") + "/purge_cache"
