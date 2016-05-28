@@ -26,7 +26,7 @@ func main() {
 
 		client := &http.Client{}
 		url := "https://api.cloudflare.com/client/v4/" + os.Getenv("CLOUDFLARE_IDENTIFIER") + "/purge_cache"
-		fmt.Println(url)
+		fmt.Fprintf(os.Stderr, url)
 		req, err := http.NewRequest("DELETE", url, body)
 		if err != nil {
 			return nil, err
