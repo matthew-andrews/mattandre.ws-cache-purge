@@ -60,9 +60,6 @@ func main() {
 			return nil, err
 		}
 		defer resp.Body.Close()
-		if resp.StatusCode > 399 {
-			return nil, errors.New("Bad Server Response: " + resp.Status)
-		}
 
 		bytes, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
