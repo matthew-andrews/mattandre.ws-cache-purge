@@ -1,2 +1,0 @@
-deploy:
-	apex deploy
