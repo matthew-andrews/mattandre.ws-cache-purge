@@ -10,8 +10,14 @@ import (
 	"os"
 )
 
-type Message struct {
-	Urls []string `json:"urls"`
+type S3Update struct {
+	Records []struct {
+		S3 struct {
+			Object struct {
+				Key string `json:"key"`
+			} `json:"object"`
+		} `json:"s3"`
+	} `json:"Records"`
 }
 
 type PurgeCacheRequestBody struct {
@@ -27,14 +33,21 @@ type PurgeCacheResponseBody struct {
 
 func main() {
 	apex.HandleFunc(func(event json.RawMessage, ctx *apex.Context) (interface{}, error) {
-		var m Message
+		var updates S3Update
 
-		if err := json.Unmarshal(event, &m); err != nil {
+		if err := json.Unmarshal(event, &updates); err != nil {
 			return nil, err
 		}
 
+		urls := make([]string, len(updates.Records))
+		for i, update := range updates.Records {
+			url := "https://mattandre.ws/" + update.S3.Object.Key
+			fmt.Fprintf(os.Stderr, "WILL PURGE: "+url)
+			urls[i] = url
+		}
+
 		requestBody, err := json.Marshal(PurgeCacheRequestBody{
-			Files: m.Urls,
+			Files: urls,
 		})
 		if err != nil {
 			return nil, err
@@ -44,7 +57,6 @@ func main() {
 
 		client := &http.Client{}
 		url := "https://api.cloudflare.com/client/v4/zones/" + os.Getenv("CLOUDFLARE_IDENTIFIER") + "/purge_cache"
-		fmt.Fprintf(os.Stderr, url)
 		req, err := http.NewRequest("DELETE", url, body)
 		if err != nil {
 			return nil, err
