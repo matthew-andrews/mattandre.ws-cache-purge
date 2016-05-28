@@ -17,6 +17,9 @@ type S3Update struct {
 			Object struct {
 				Key string `json:"key"`
 			} `json:"object"`
+			Bucket struct {
+				Name string `json:"name"`
+			} `json:"object"`
 		} `json:"s3"`
 	} `json:"Records"`
 }
@@ -42,7 +45,7 @@ func main() {
 
 		urls := make([]string, len(updates.Records), 2*len(updates.Records))
 		for i, update := range updates.Records {
-			url := "https://mattandre.ws/" + update.S3.Object.Key
+			url := "https://" + update.S3.Bucket.Name + "/" + update.S3.Object.Key
 			fmt.Fprintf(os.Stderr, "WILL PURGE: "+url+"\n")
 			urls[i] = url
 
@@ -70,7 +73,7 @@ func main() {
 			return nil, err
 		}
 
-		req.Header.Add("X-Auth-Email", "matt@mattandre.ws")
+		req.Header.Add("X-Auth-Email", os.Getenv("CLOUDFLARE_AUTH_EMAIL"))
 		req.Header.Add("X-Auth-Key", os.Getenv("CLOUDFLARE_API_KEY"))
 		req.Header.Add("Content-Type", "application/json")
 
@@ -78,8 +81,8 @@ func main() {
 		if err != nil {
 			return nil, err
 		}
-		defer resp.Body.Close()
 
+		defer resp.Body.Close()
 		bytes, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return nil, err
