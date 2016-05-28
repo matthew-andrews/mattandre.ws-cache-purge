@@ -1,0 +1,6 @@
+{
+  "name": "mattandre.ws-cache-purge",
+  "description": "Listens to stream of changes to the mattandre.ws S3 bucket and purges CloudFlare every time",
+  "role": ""arn:aws:iam::027104099916:role/ApplicationRoleFor_mattandre.ws-cache-purge",
+  "retainedVersions": 5
+}
