@@ -11,7 +11,7 @@ import (
 )
 
 type message struct {
-	Url string `json:"url"`
+	Urls []string `json:"urls"`
 }
 
 type PurgeCacheRequest struct {
@@ -27,7 +27,7 @@ func main() {
 		}
 
 		requestObject, err := json.Marshal(PurgeCacheRequest{
-			Files: []string{m.Url},
+			Files: m.Urls,
 		})
 		if err != nil {
 			return nil, err
