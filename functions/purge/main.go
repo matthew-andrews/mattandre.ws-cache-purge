@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/apex/go-apex"
 	"net/http"
 	"os"
@@ -24,7 +25,9 @@ func main() {
 		body := strings.NewReader("{\"files\":[\"" + m.Url + "/\"]}")
 
 		client := &http.Client{}
-		req, err := http.NewRequest("DELETE", "https://api.cloudflare.com/client/v4/"+os.Getenv("CLOUDFLARE_IDENTIFIER")+"/purge_cache", body)
+		url := "https://api.cloudflare.com/client/v4/" + os.Getenv("CLOUDFLARE_IDENTIFIER") + "/purge_cache"
+		fmt.Println(url)
+		req, err := http.NewRequest("DELETE", url, body)
 		if err != nil {
 			return nil, err
 		}
