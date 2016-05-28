@@ -24,7 +24,8 @@ func main() {
 		body := strings.NewReader("{\"files\":[\"" + m.Url + "/\"]}")
 
 		client := &http.Client{}
-		if req, err := http.NewRequest("DELETE", "https://api.cloudflare.com/client/v4/"+os.Getenv("CLOUDFLARE_IDENTIFIER")+"/purge_cache", body); err != nil {
+		req, err := http.NewRequest("DELETE", "https://api.cloudflare.com/client/v4/"+os.Getenv("CLOUDFLARE_IDENTIFIER")+"/purge_cache", body)
+		if err != nil {
 			return nil, err
 		}
 
@@ -32,11 +33,13 @@ func main() {
 		req.Header.Add("X-Auth-Key", os.Getenv("CLOUDFLARE_API_KEY"))
 		req.Header.Add("Content-Type", "application/json")
 
-		if resp, err := client.Do(req); err != nil {
+		resp, err := client.Do(req)
+		if err != nil {
 			return nil, err
 		}
+		defer resp.Body.Close()
 		if resp.StatusCode > 399 {
-			return errors.New("Bad Server Response: " + resp.Status)
+			return nil, errors.New("Bad Server Response: " + resp.Status)
 		}
 		return m, nil
 	})
