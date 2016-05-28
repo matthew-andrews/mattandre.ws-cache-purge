@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"regexp"
 )
 
 type S3Update struct {
@@ -39,11 +40,18 @@ func main() {
 			return nil, err
 		}
 
-		urls := make([]string, len(updates.Records))
+		urls := make([]string, len(updates.Records), 2*len(updates.Records))
 		for i, update := range updates.Records {
 			url := "https://mattandre.ws/" + update.S3.Object.Key
 			fmt.Fprintf(os.Stderr, "WILL PURGE: "+url)
 			urls[i] = url
+
+			// If ends with index.html also purge that URL minus index.html
+			re := regexp.MustCompile("index\\.html$")
+			if trimmedUrl := re.ReplaceAllString(url, ""); trimmedUrl != url {
+				fmt.Fprintf(os.Stderr, "WILL PURGE: "+trimmedUrl)
+				urls[i] = trimmedUrl
+			}
 		}
 
 		requestBody, err := json.Marshal(PurgeCacheRequestBody{
