@@ -26,14 +26,16 @@ func main() {
 	apex.HandleFunc(func(event json.RawMessage, ctx *apex.Context) (interface{}, error) {
 		urls, err := s3eventtourls.S3EventToUrls(event)
 		if err != nil {
+			fmt.Fprintf(os.Stderr, "event=UNEXPECTED_ERROR error=%s\n", err)
 			return nil, err
 		}
 
-		fmt.Fprintf(os.Stderr, "WILL PURGE: %s\n", urls)
+		fmt.Fprintf(os.Stderr, "event=WILL_PURGE urls=%s\n", urls)
 		requestBody, err := json.Marshal(PurgeCacheRequestBody{
 			Files: urls,
 		})
 		if err != nil {
+			fmt.Fprintf(os.Stderr, "event=UNEXPECTED_ERROR error=%s\n", err)
 			return nil, err
 		}
 
@@ -43,6 +45,7 @@ func main() {
 		url := "https://api.cloudflare.com/client/v4/zones/" + os.Getenv("CLOUDFLARE_IDENTIFIER") + "/purge_cache"
 		req, err := http.NewRequest("DELETE", url, body)
 		if err != nil {
+			fmt.Fprintf(os.Stderr, "event=UNEXPECTED_ERROR error=%s\n", err)
 			return nil, err
 		}
 
@@ -52,16 +55,19 @@ func main() {
 
 		resp, err := client.Do(req)
 		if err != nil {
+			fmt.Fprintf(os.Stderr, "event=UNEXPECTED_ERROR error=%s\n", err)
 			return nil, err
 		}
 
 		defer resp.Body.Close()
 		bytes, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
+			fmt.Fprintf(os.Stderr, "event=UNEXPECTED_ERROR error=%s\n", err)
 			return nil, err
 		}
 		var responseBody PurgeCacheResponseBody
 		if err := json.Unmarshal(bytes, &responseBody); err != nil {
+			fmt.Fprintf(os.Stderr, "event=UNEXPECTED_ERROR error=%s\n", err)
 			return nil, err
 		}
 
