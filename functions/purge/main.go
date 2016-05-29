@@ -5,24 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/apex/go-apex"
+	"github.com/matthew-andrews/mattandre.ws-websitecdnpurge/s3eventtourls"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"regexp"
 )
-
-type S3Update struct {
-	Records []struct {
-		S3 struct {
-			Object struct {
-				Key string `json:"key"`
-			} `json:"object"`
-			Bucket struct {
-				Name string `json:"name"`
-			} `json:"bucket"`
-		} `json:"s3"`
-	} `json:"Records"`
-}
 
 type PurgeCacheRequestBody struct {
 	Files []string `json:"files"`
@@ -37,26 +24,12 @@ type PurgeCacheResponseBody struct {
 
 func main() {
 	apex.HandleFunc(func(event json.RawMessage, ctx *apex.Context) (interface{}, error) {
-		var updates S3Update
-
-		if err := json.Unmarshal(event, &updates); err != nil {
+		urls, err := s3eventtourls.S3EventToUrls(event)
+		if err != nil {
 			return nil, err
 		}
 
-		urls := make([]string, len(updates.Records), 2*len(updates.Records))
-		for i, update := range updates.Records {
-			url := "https://" + update.S3.Bucket.Name + "/" + update.S3.Object.Key
-			fmt.Fprintf(os.Stderr, "WILL PURGE: "+url+"\n")
-			urls[i] = url
-
-			// If ends with index.html also purge that URL minus index.html
-			re := regexp.MustCompile("index\\.html$")
-			if trimmedUrl := re.ReplaceAllString(url, ""); trimmedUrl != url {
-				fmt.Fprintf(os.Stderr, "WILL PURGE: "+trimmedUrl+"\n")
-				urls[i] = trimmedUrl
-			}
-		}
-
+		fmt.Fprintf(os.Stderr, "WILL PURGE: %s\n", urls)
 		requestBody, err := json.Marshal(PurgeCacheRequestBody{
 			Files: urls,
 		})
