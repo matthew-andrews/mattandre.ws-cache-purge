@@ -1,5 +1,5 @@
 package main
 
-// Fake go file that does nothing to please CircleCI
+// Fake go file that does nothing but please CircleCI
 func main() {
 }
