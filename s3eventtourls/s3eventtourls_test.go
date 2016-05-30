@@ -23,7 +23,7 @@ func TestS3EventToUrls(t *testing.T) {
 		t.Fatalf("S3EventToUrls errored incorrectly %s", err)
 	}
 
-	err = slicesAreEquivalent([]string{"https://mattandre.ws/cv/index.html", "https://mattandre.ws/cv/"}, actual)
+	err = slicesAreEquivalent([]string{"https://mattandre.ws/cv/index.html", "https://mattandre.ws/cv/", "https://mattandre.ws/cv"}, actual)
 
 	if err != nil {
 		t.Fatalf(err.Error())
@@ -32,7 +32,7 @@ func TestS3EventToUrls(t *testing.T) {
 }
 func slicesAreEquivalent(expected []string, actual []string) error {
 	if len(expected) != len(actual) {
-		return errors.New("returns slice should be length 2")
+		return errors.New(fmt.Sprintf("returned slice should be length %d", len(expected)))
 	}
 
 	for i, _ := range expected {

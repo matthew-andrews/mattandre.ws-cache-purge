@@ -31,8 +31,9 @@ func S3EventToUrls(event json.RawMessage) ([]string, error) {
 		urls = append(urls, url)
 
 		// If ends with index.html also purge that URL minus index.html
-		re := regexp.MustCompile("index\\.html$")
+		re := regexp.MustCompile("/index\\.html$")
 		if trimmedUrl := re.ReplaceAllString(url, ""); trimmedUrl != url {
+			urls = append(urls, trimmedUrl+"/")
 			urls = append(urls, trimmedUrl)
 		}
 	}
