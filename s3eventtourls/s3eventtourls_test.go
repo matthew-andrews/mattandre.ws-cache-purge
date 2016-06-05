@@ -2,8 +2,7 @@ package s3eventtourls
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -23,23 +22,7 @@ func TestS3EventToUrls(t *testing.T) {
 		t.Fatalf("S3EventToUrls errored incorrectly %s", err)
 	}
 
-	err = slicesAreEquivalent([]string{"https://mattandre.ws/cv/index.html", "https://mattandre.ws/cv/", "https://mattandre.ws/cv"}, actual)
-
-	if err != nil {
-		t.Fatalf(err.Error())
+	if !reflect.DeepEqual([]string{"https://mattandre.ws/cv/index.html", "https://mattandre.ws/cv/", "https://mattandre.ws/cv"}, actual) {
+		t.Fatalf("%s does not match expected value", actual)
 	}
-
-}
-func slicesAreEquivalent(expected []string, actual []string) error {
-	if len(expected) != len(actual) {
-		return errors.New(fmt.Sprintf("returned slice should be length %d", len(expected)))
-	}
-
-	for i, _ := range expected {
-		if expected[i] != actual[i] {
-			return errors.New(fmt.Sprintf("item at index %d should match %s but was %s", i, expected[i], actual[i]))
-		}
-	}
-
-	return nil
 }
